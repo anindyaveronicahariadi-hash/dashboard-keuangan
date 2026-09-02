@@ -3,12 +3,13 @@ import { supabase, usernameToEmail, emailToUsername } from "./supabaseClient";
 import {
   LayoutDashboard, Landmark, HandCoins, Receipt, ClipboardList, Users,
   LogOut, Plus, Trash2, Pencil, X, Eye, Loader2, AlertCircle,
-  TrendingUp, TrendingDown, Wallet, CheckCircle2
+  TrendingUp, TrendingDown, Wallet, CheckCircle2, UploadCloud
 } from "lucide-react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend
 } from "recharts";
+import ImportPage from "./ImportPage.jsx";
 
 /* ============================================================
    DATA REFERENSI
@@ -659,8 +660,10 @@ const NAV = [
   { key: "utang", label: "Utang", icon: Landmark, roles: ["admin","utang"] },
   { key: "piutang", label: "Piutang", icon: Wallet, roles: ["admin","piutang"] },
   { key: "belanja", label: "Realisasi Belanja", icon: Receipt, roles: ["admin","belanja"] },
+  { key: "import", label: "Import Excel", icon: UploadCloud, roles: ["admin","pendapatan","utang","piutang","belanja"] },
   { key: "akun", label: "Kelola Akun", icon: Users, roles: ["admin"] },
 ];
+const JENIS_PER_ROLE = { admin: ["pendapatan","utang","piutang","belanja"], pendapatan: ["pendapatan"], utang: ["utang"], piutang: ["piutang"], belanja: ["belanja"] };
 
 export default function App() {
   const [session, setSession] = useState(null);
@@ -718,6 +721,10 @@ export default function App() {
     if (page === "utang" && (currentUser.role === "admin" || currentUser.role === "utang")) return <HutangPiutangPage jenis="utang" table={utangTable} user={currentUser} />;
     if (page === "piutang" && (currentUser.role === "admin" || currentUser.role === "piutang")) return <HutangPiutangPage jenis="piutang" table={piutangTable} user={currentUser} />;
     if (page === "belanja" && (currentUser.role === "admin" || currentUser.role === "belanja")) return <BelanjaPage table={belanjaTable} user={currentUser} />;
+    if (page === "import" && JENIS_PER_ROLE[currentUser.role]) {
+      const reloadAll = () => { pendapatanTable.reload(); utangTable.reload(); piutangTable.reload(); belanjaTable.reload(); };
+      return <ImportPage allowedJenis={JENIS_PER_ROLE[currentUser.role]} reloadAll={reloadAll} user={currentUser} />;
+    }
     if (page === "akun" && currentUser.role === "admin") return <AkunPage currentUser={currentUser} />;
     return <DashboardPage pendapatan={pendapatanTable.rows} utang={utangTable.rows} piutang={piutangTable.rows} belanja={belanjaTable.rows} />;
   };
