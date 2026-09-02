@@ -770,7 +770,10 @@ export default function App() {
           .rsl-main { margin-left: 0 !important; }
           .rsl-topbar { display: flex !important; }
         }
-        @media (min-width: 881px) { .rsl-overlay { display: none !important; } }
+        @media (min-width: 881px) {
+          .rsl-overlay { display: none !important; }
+          .rsl-sidebar { left: 0 !important; }
+        }
       `}</style>
     </div>
   );
