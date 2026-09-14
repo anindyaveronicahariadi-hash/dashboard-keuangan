@@ -299,7 +299,7 @@ function PendapatanPage({ table, user }) {
   const { rows, insert, update, remove } = table;
   const [modal, setModal] = useState(null);
   const [filterTahun, setFilterTahun] = useState("semua");
-  const blank = { tahun: thisYear, bulan: 1, kategori: KATEGORI_PENDAPATAN[0].nama + "||" + KATEGORI_PENDAPATAN[0].kelompok, jumlah: "", keterangan: "" };
+  const blank = { tahun: thisYear, bulan: 1, tanggal: "", kategori: KATEGORI_PENDAPATAN[0].nama + "||" + KATEGORI_PENDAPATAN[0].kelompok, jumlah: "", keterangan: "" };
   const [form, setForm] = useState(blank);
 
   const tahunList = useMemo(() => Array.from(new Set(rows.map(d => String(d.tahun)))).sort().reverse(), [rows]);
@@ -310,7 +310,7 @@ function PendapatanPage({ table, user }) {
   const submit = async (e) => {
     e.preventDefault();
     const [kategori, kelompok] = form.kategori.split("||");
-    const entry = { tahun: Number(form.tahun), bulan: Number(form.bulan), kategori, kelompok, jumlah: Number(form.jumlah), keterangan: form.keterangan || "", petugas: user.nama };
+    const entry = { tahun: Number(form.tahun), bulan: Number(form.bulan), tanggal: form.tanggal || null, kategori, kelompok, jumlah: Number(form.jumlah), keterangan: form.keterangan || "", petugas: user.nama };
     if (modal === "new") await insert(entry); else await update(modal, entry);
     setModal(null);
   };
@@ -330,10 +330,11 @@ function PendapatanPage({ table, user }) {
       <div className="rsl-card rsl-scroll" style={{ overflowX: "auto" }}>
         {filtered.length === 0 ? <EmptyState text="Belum ada data pendapatan." /> : (
           <table className="rsl-table">
-            <thead><tr><th>Bulan</th><th>Tahun</th><th>Kelompok</th><th>Kategori</th><th>Jumlah</th><th>Petugas</th><th>Keterangan</th><th></th></tr></thead>
+            <thead><tr><th>Tanggal</th><th>Bulan</th><th>Tahun</th><th>Kelompok</th><th>Kategori</th><th>Jumlah</th><th>Petugas</th><th>Keterangan</th><th></th></tr></thead>
             <tbody>
               {filtered.map(d => (
                 <tr key={d.id}>
+                  <td>{d.tanggal || "-"}</td>
                   <td>{BULAN[d.bulan - 1]}</td><td>{d.tahun}</td>
                   <td style={{ color: "var(--muted)" }}>{d.kelompok}</td>
                   <td style={{ fontWeight: 600 }}>{d.kategori}</td>
@@ -358,6 +359,7 @@ function PendapatanPage({ table, user }) {
               </Field></div>
               <div style={{ flex: 1 }}><Field label="Tahun"><input className="rsl-input" type="number" value={form.tahun} onChange={e => setForm({ ...form, tahun: e.target.value })} required /></Field></div>
             </div>
+            <Field label="Tanggal (opsional)"><input className="rsl-input" type="date" value={form.tanggal || ""} onChange={e => setForm({ ...form, tanggal: e.target.value })} /></Field>
             <Field label="Kategori">
               <select className="rsl-select" value={form.kategori} onChange={e => setForm({ ...form, kategori: e.target.value })}>
                 {Object.entries(KATEGORI_PENDAPATAN.reduce((acc, k) => { (acc[k.kelompok] ||= []).push(k); return acc; }, {})).map(([kel, items]) => (
