@@ -47,6 +47,44 @@ const KATEGORI_PENDAPATAN = [
 const KELOMPOK_UTANG = ["Utang Bank/Lembaga Keuangan","Utang Supplier/Vendor","Utang Pajak","Utang Lain-lain"];
 const KELOMPOK_PIUTANG = ["Piutang Pelanggan/Pembeli","Piutang Karyawan","Piutang Pihak Lain","Piutang Lain-lain"];
 
+// Daftar Kode Sub Kegiatan (dari data Pak Direktur) — dipakai untuk
+// dropdown pencarian di form Realisasi Belanja.
+const SUB_KEGIATAN = [
+  { kode: '00.01.01.01.08', uraian: 'Penyusunan Dokumen Perencanaan BLUD', anggaran: 28800000 },
+  { kode: '00.01.01.02.12', uraian: 'Koordinasi dan Pelaksanaan Akuntansi BLUD', anggaran: 90000000 },
+  { kode: '00.01.01.05.09', uraian: 'Pendidikan dan Pelatihan Pegawai Berdasarkan Tugas dan Fungsi', anggaran: 250000000 },
+  { kode: '00.01.01.06.01', uraian: 'Penyediaan Komponen Instalasi Listrik/Penerangan Bangunan Kantor', anggaran: 67998545 },
+  { kode: '00.01.01.06.02', uraian: 'Penyediaan Peralatan dan Perlengkapan Kantor', anggaran: 242803790 },
+  { kode: '00.01.01.06.03', uraian: 'Penyediaan Peralatan Rumah Tangga', anggaran: 153346410 },
+  { kode: '00.01.01.06.05', uraian: 'Penyediaan Barang Cetakan dan Penggandaan', anggaran: 35130000 },
+  { kode: '00.01.01.06.06', uraian: 'Penyediaan Bahan Bacaan dan Peraturan Perundang-undangan', anggaran: 9840000 },
+  { kode: '00.01.01.06.07', uraian: 'Penyediaan Bahan/Material', anggaran: 854047500 },
+  { kode: '00.01.01.06.08', uraian: 'Fasilitasi Kunjungan Tamu', anggaran: 37840000 },
+  { kode: '00.01.01.06.09', uraian: 'Penyelenggaraan Rapat Koordinasi dan Konsultasi SKPD dan/atau BLUD', anggaran: 223800000 },
+  { kode: '00.01.01.07.05', uraian: 'Pengadaan Mebel', anggaran: 214243440 },
+  { kode: '00.01.01.07.11', uraian: 'Pengadaan Sarana dan Prasarana Pendukung Gedung Kantor atau Bangunan Lainnya', anggaran: 412011640 },
+  { kode: '00.01.01.08.01', uraian: 'Penyediaan Jasa Surat Menyurat', anggaran: 10500000 },
+  { kode: '00.01.01.08.02', uraian: 'Penyediaan Jasa Komunikasi, Sumber Daya Air dan Listrik', anggaran: 593816000 },
+  { kode: '00.01.01.08.04', uraian: 'Penyediaan Jasa Pelayanan Umum Kantor', anggaran: 6005000000 },
+  { kode: '00.01.01.09.02', uraian: 'Penyediaan Jasa Pemeliharaan, Biaya Pemeliharaan, Pajak dan Perizinan Kendaraan Dinas Operasional atau Lapangan', anggaran: 213400000 },
+  { kode: '00.01.01.09.06', uraian: 'Pemeliharaan Peralatan dan Mesin Lainnya', anggaran: 374775500 },
+  { kode: '00.01.01.09.09', uraian: 'Pemeliharaan/Rehabilitasi Gedung Kantor dan Bangunan Lainnya', anggaran: 154350000 },
+  { kode: '00.01.01.09.10', uraian: 'Pemeliharaan/Rehabilitasi Sarana dan Prasarana Gedung Kantor atau Bangunan Lainnya', anggaran: 99380000 },
+  { kode: '00.01.01.09.11', uraian: 'Pemeliharaan/Rehabilitasi Sarana dan Prasarana Pendukung Gedung Kantor atau Bangunan Lainnya', anggaran: 445027826 },
+  { kode: '02.01.02.01.01', uraian: 'Pelayanan medik umum', anggaran: 431740254 },
+  { kode: '02.01.02.01.02', uraian: 'pelayanan medik spesialis', anggaran: 1086049200 },
+  { kode: '02.01.02.03.01', uraian: 'Pelayanan Farmasi', anggaran: 10756266864 },
+  { kode: '02.01.02.03.03', uraian: 'pengolahan makanan/gizi', anggaran: 944391500 },
+  { kode: '02.01.02.03.04', uraian: 'pemeliharaan sarana prasarana dan alat kesehatan', anggaran: 375192300 },
+  { kode: '02.01.02.03.06', uraian: 'pemulasaran jenazah', anggaran: 35425000 },
+  { kode: '02.01.02.03.08', uraian: 'Pelaksanaan Akreditasi Fasilitas Kesehatan di Kabupaten/Kota', anggaran: 98930000 },
+  { kode: '02.01.02.03.09', uraian: 'Administrasi Pelayanan JKN FKRTL', anggaran: 22726876804.62 },
+  { kode: '02.01.02.03.16', uraian: 'Peningkatan Mutu Pelayanan Fasilitas Kesehatan', anggaran: 141778023 },
+  { kode: '02.01.02.03.33', uraian: 'Peningkatan Upaya Promosi Kesehatan, Advokasi, Kemitraan dan Pemberdayaan Masyarakat', anggaran: 101360000 },
+  { kode: '02.01.02.03.37', uraian: 'Operasional Pelayanan Rumah Sakit ', anggaran: 85000000 },
+  { kode: '02.01.02.03.40', uraian: 'Pengadaan Bahan Habis Pakai ', anggaran: 75286700 },
+];
+
 const ROLES = [
   { value: "admin", label: "Admin", desc: "Kelola akun & seluruh data" },
   { value: "direktur", label: "Direktur", desc: "Lihat dashboard saja" },
@@ -130,6 +168,53 @@ function Modal({ title, onClose, children, width = 560 }) {
   );
 }
 function Field({ label, children }) { return <div><label className="rsl-label">{label}</label>{children}</div>; }
+
+// Input angka Rupiah dengan pemisah ribuan otomatis saat mengetik.
+// Menyimpan nilai sebagai string digit murni (kompatibel dengan Number()).
+function RupiahInput({ value, onChange, required, placeholder }) {
+  const display = value === "" || value === null || value === undefined ? "" : Number(value).toLocaleString("id-ID");
+  const handleChange = (e) => {
+    const raw = e.target.value.replace(/[^\d]/g, "");
+    onChange(raw);
+  };
+  return (
+    <div style={{ position: "relative" }}>
+      <span style={{ position: "absolute", left: 11, top: 9, fontSize: 14, color: "var(--muted)", pointerEvents: "none" }}>Rp</span>
+      <input className="rsl-input" style={{ paddingLeft: 34 }} inputMode="numeric" value={display} onChange={handleChange} placeholder={placeholder} required={required} />
+    </div>
+  );
+}
+
+// Dropdown pencarian Kode Sub Kegiatan (data dari file referensi Direktur).
+function SubKegiatanPicker({ value, onSelect }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState(value || "");
+  useEffect(() => { setQuery(value || ""); }, [value]);
+  const q = query.toLowerCase();
+  const filtered = SUB_KEGIATAN.filter(s => (s.kode + " " + s.uraian).toLowerCase().includes(q)).slice(0, 8);
+  return (
+    <div style={{ position: "relative" }}>
+      <input
+        className="rsl-input"
+        value={query}
+        onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder="Ketik kode atau nama sub kegiatan…"
+      />
+      {open && filtered.length > 0 && (
+        <div style={{ position: "absolute", zIndex: 20, top: "100%", left: 0, right: 0, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 5, marginTop: 4, maxHeight: 230, overflowY: "auto", boxShadow: "0 6px 18px rgba(0,0,0,.1)" }}>
+          {filtered.map(s => (
+            <div key={s.kode} onMouseDown={() => { onSelect(s); setQuery(s.kode); setOpen(false); }} style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid var(--line)" }}>
+              <div style={{ fontWeight: 600, fontSize: 13 }}>{s.kode}</div>
+              <div style={{ fontSize: 12, color: "var(--muted)" }}>{s.uraian}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 function EmptyState({ text }) {
   return (
     <div style={{ padding: "40px 20px", textAlign: "center", color: "var(--muted)" }}>
@@ -367,7 +452,7 @@ function PendapatanPage({ table, user }) {
                 ))}
               </select>
             </Field>
-            <Field label="Jumlah (Rp)"><input className="rsl-input" type="number" min="0" value={form.jumlah} onChange={e => setForm({ ...form, jumlah: e.target.value })} required /></Field>
+            <Field label="Jumlah (Rp)"><RupiahInput value={form.jumlah} onChange={v => setForm({ ...form, jumlah: v })} required /></Field>
             <Field label="Keterangan (opsional)"><input className="rsl-input" value={form.keterangan} onChange={e => setForm({ ...form, keterangan: e.target.value })} /></Field>
             <button type="submit" className="rsl-btn rsl-btn-primary" style={{ justifyContent: "center", marginTop: 4 }}>Simpan</button>
           </form>
@@ -445,8 +530,8 @@ function HutangPiutangPage({ jenis, table, user }) {
               <div style={{ flex: 1 }}><Field label="Tanggal Surat"><input className="rsl-input" type="date" value={form.tgl_surat || ""} onChange={e => setForm({ ...form, tgl_surat: e.target.value })} /></Field></div>
             </div>
             <div style={{ display: "flex", gap: 12 }}>
-              <div style={{ flex: 1 }}><Field label={label.nilai}><input className="rsl-input" type="number" min="0" value={form.total_tagihan} onChange={e => setForm({ ...form, total_tagihan: e.target.value })} required /></Field></div>
-              <div style={{ flex: 1 }}><Field label="Jumlah Dibayar"><input className="rsl-input" type="number" min="0" value={form.dibayar} onChange={e => setForm({ ...form, dibayar: e.target.value })} /></Field></div>
+              <div style={{ flex: 1 }}><Field label={label.nilai}><RupiahInput value={form.total_tagihan} onChange={v => setForm({ ...form, total_tagihan: v })} required /></Field></div>
+              <div style={{ flex: 1 }}><Field label="Jumlah Dibayar"><RupiahInput value={form.dibayar} onChange={v => setForm({ ...form, dibayar: v })} /></Field></div>
             </div>
             <Field label="Tanggal Bayar (jika ada)"><input className="rsl-input" type="date" value={form.tgl_bayar || ""} onChange={e => setForm({ ...form, tgl_bayar: e.target.value })} /></Field>
             <Field label="Keterangan"><input className="rsl-input" value={form.keterangan} onChange={e => setForm({ ...form, keterangan: e.target.value })} /></Field>
@@ -519,11 +604,16 @@ function BelanjaPage({ table, user }) {
       {modal && (
         <Modal title={modal === "new" ? "Tambah Realisasi Belanja" : "Ubah Realisasi Belanja"} onClose={() => setModal(null)}>
           <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <Field label="Kode Sub-Kegiatan"><input className="rsl-input" value={form.kode} onChange={e => setForm({ ...form, kode: e.target.value })} placeholder="00.01.01.01.08" /></Field>
+            <Field label="Kode Sub-Kegiatan">
+              <SubKegiatanPicker
+                value={form.kode}
+                onSelect={(s) => setForm({ ...form, kode: s.kode, uraian: s.uraian, anggaran: form.anggaran || String(s.anggaran) })}
+              />
+            </Field>
             <Field label="Uraian Kegiatan"><input className="rsl-input" value={form.uraian} onChange={e => setForm({ ...form, uraian: e.target.value })} required /></Field>
             <div style={{ display: "flex", gap: 12 }}>
-              <div style={{ flex: 1 }}><Field label="Anggaran / Pagu (Rp)"><input className="rsl-input" type="number" min="0" value={form.anggaran} onChange={e => setForm({ ...form, anggaran: e.target.value })} required /></Field></div>
-              <div style={{ flex: 1 }}><Field label="Realisasi (Rp)"><input className="rsl-input" type="number" min="0" value={form.realisasi} onChange={e => setForm({ ...form, realisasi: e.target.value })} /></Field></div>
+              <div style={{ flex: 1 }}><Field label="Anggaran / Pagu (Rp)"><RupiahInput value={form.anggaran} onChange={v => setForm({ ...form, anggaran: v })} required /></Field></div>
+              <div style={{ flex: 1 }}><Field label="Realisasi (Rp)"><RupiahInput value={form.realisasi} onChange={v => setForm({ ...form, realisasi: v })} /></Field></div>
             </div>
             <button type="submit" className="rsl-btn rsl-btn-primary" style={{ justifyContent: "center", marginTop: 4 }}>Simpan</button>
           </form>
