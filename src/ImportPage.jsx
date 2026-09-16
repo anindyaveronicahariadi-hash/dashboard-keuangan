@@ -1,16 +1,18 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import * as XLSX from "xlsx";
 import { supabase } from "./supabaseClient";
 import { PARSERS } from "./importParsers";
-import { UploadCloud, AlertCircle, CheckCircle2, Loader2, FileSpreadsheet } from "lucide-react";
+import { sheetToObjects, guessMapping, buildBelanjaRows, BELANJA_FIELDS } from "./flexibleImport";
+import { UploadCloud, AlertCircle, CheckCircle2, Loader2, FileSpreadsheet, Settings2 } from "lucide-react";
 
 const JENIS_LABEL = { pendapatan: "Pendapatan", utang: "Utang", piutang: "Piutang", belanja: "Realisasi Belanja" };
 const rupiah = (n) => "Rp " + Math.round(Number(n) || 0).toLocaleString("id-ID");
+const FLEXIBLE_JENIS = { belanja: BELANJA_FIELDS }; // jenis yang pakai mode pemetaan kolom
 
 function pickSheet(workbook, jenis) {
   const names = workbook.SheetNames;
   if (names.length === 1) return names[0];
-  const hints = PARSERS[jenis].sheetHints;
+  const hints = PARSERS[jenis]?.sheetHints || [];
   const match = names.find(n => hints.some(h => n.toLowerCase().includes(h)));
   return match || null;
 }
@@ -27,11 +29,34 @@ export default function ImportPage({ allowedJenis, reloadAll, user }) {
   const [result, setResult] = useState(null);
   const fileInput = useRef(null);
 
-  const reset = () => { setFileName(""); setSheetNames([]); setChosenSheet(""); setWorkbook(null); setPreview([]); setParseError(""); setResult(null); };
+  // state khusus mode pemetaan kolom (fleksibel)
+  const [rawSheet, setRawSheet] = useState(null); // {headers, rows}
+  const [mapping, setMapping] = useState({});
+  const [aggregate, setAggregate] = useState(true);
+
+  const isFlexible = !!FLEXIBLE_JENIS[jenis];
+  const fields = FLEXIBLE_JENIS[jenis];
+
+  const reset = () => {
+    setFileName(""); setSheetNames([]); setChosenSheet(""); setWorkbook(null);
+    setPreview([]); setParseError(""); setResult(null); setRawSheet(null); setMapping({});
+  };
 
   const runParse = (wb, sheetName) => {
     const ws = wb.Sheets[sheetName];
     const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
+
+    if (isFlexible) {
+      const sheet = sheetToObjects(aoa);
+      setRawSheet(sheet);
+      if (sheet.rows.length === 0) { setParseError("Tidak ada baris data yang terbaca dari sheet ini."); return; }
+      const guessed = guessMapping(sheet.headers, fields);
+      setMapping(guessed);
+      setParseError("");
+      setPreview(buildBelanjaRows(sheet.rows, guessed, aggregate));
+      return;
+    }
+
     const { rows, error } = PARSERS[jenis].fn(aoa);
     if (error) { setParseError(error); setPreview([]); }
     else { setParseError(""); setPreview(rows); }
@@ -54,6 +79,16 @@ export default function ImportPage({ allowedJenis, reloadAll, user }) {
   const onChooseSheet = (name) => { setChosenSheet(name); if (workbook) runParse(workbook, name); };
   const onChooseJenis = (j) => { setJenis(j); reset(); if (fileInput.current) fileInput.current.value = ""; };
 
+  const updateMapping = (key, header) => {
+    const next = { ...mapping, [key]: header || null };
+    setMapping(next);
+    if (rawSheet) setPreview(buildBelanjaRows(rawSheet.rows, next, aggregate));
+  };
+  const toggleAggregate = (checked) => {
+    setAggregate(checked);
+    if (rawSheet) setPreview(buildBelanjaRows(rawSheet.rows, mapping, checked));
+  };
+
   const doImport = async () => {
     setBusy(true); setResult(null);
     const rows = preview.map(r => ({ ...r, petugas: r.petugas || user.nama }));
@@ -67,17 +102,17 @@ export default function ImportPage({ allowedJenis, reloadAll, user }) {
     }
     setBusy(false);
     setResult({ ok: true, message: `${inserted} baris berhasil dimasukkan ke ${JENIS_LABEL[jenis]}.` });
-    setPreview([]);
+    setPreview([]); setRawSheet(null);
     reloadAll();
   };
 
-  const cols = PARSERS[jenis].columns;
+  const cols = isFlexible ? fields.map(f => f.key) : PARSERS[jenis].columns;
 
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontSize: 24, fontWeight: 600, margin: "0 0 4px" }}>Import dari Excel</h1>
-        <p style={{ fontSize: 13.5, color: "var(--muted)", margin: 0 }}>Unggah kertas kerja Excel yang biasa dipakai tim — datanya otomatis terekap ke database, tanpa entri ulang satu per satu.</p>
+        <p style={{ fontSize: 13.5, color: "var(--muted)", margin: 0 }}>Unggah file Excel yang biasa dipakai tim — datanya otomatis terekap ke database, tanpa entri ulang satu per satu.</p>
       </div>
 
       {allowedJenis.length > 1 && (
@@ -97,7 +132,9 @@ export default function ImportPage({ allowedJenis, reloadAll, user }) {
         }}>
           <UploadCloud size={26} color="var(--teal)" />
           <span style={{ fontWeight: 600, fontSize: 14 }}>{fileName || `Klik untuk pilih file Excel (${JENIS_LABEL[jenis]})`}</span>
-          <span style={{ fontSize: 12, color: "var(--muted)" }}>Bisa unggah keseluruhan file kertas kerja, atau sheet yang sudah dipisah sendiri (.xlsx)</span>
+          <span style={{ fontSize: 12, color: "var(--muted)" }}>
+            {isFlexible ? "Boleh file laporan format apa pun — Anda akan diminta mencocokkan kolomnya sebentar (.xlsx)" : "Bisa unggah keseluruhan file kertas kerja, atau sheet yang sudah dipisah sendiri (.xlsx)"}
+          </span>
         </label>
         <input id="rsl-file" ref={fileInput} type="file" accept=".xlsx,.xls" onChange={handleFile} style={{ display: "none" }} />
 
@@ -123,6 +160,31 @@ export default function ImportPage({ allowedJenis, reloadAll, user }) {
           </div>
         )}
       </div>
+
+      {isFlexible && rawSheet && (
+        <div className="rsl-card" style={{ padding: 20, marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <Settings2 size={16} color="var(--teal)" />
+            <span style={{ fontWeight: 600, fontSize: 14 }}>Cocokkan Kolom</span>
+          </div>
+          <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 16px" }}>Sistem sudah menebak sebagian — cek dan perbaiki kalau ada yang meleset.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14, marginBottom: 16 }}>
+            {fields.map(f => (
+              <div key={f.key}>
+                <label className="rsl-label">{f.label}{f.required && " *"}</label>
+                <select className="rsl-select" value={mapping[f.key] || ""} onChange={e => updateMapping(f.key, e.target.value)}>
+                  <option value="">— tidak dipakai —</option>
+                  {rawSheet.headers.map(h => <option key={h} value={h}>{h}</option>)}
+                </select>
+              </div>
+            ))}
+          </div>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+            <input type="checkbox" checked={aggregate} onChange={e => toggleAggregate(e.target.checked)} />
+            Gabungkan baris dengan Kode Sub Kegiatan yang sama (realisasi dijumlahkan, anggaran diambil sekali)
+          </label>
+        </div>
+      )}
 
       {preview.length > 0 && (
         <div className="rsl-card" style={{ padding: 20 }}>

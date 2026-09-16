@@ -17,6 +17,7 @@ create table if not exists public.pendapatan (
   id uuid primary key default gen_random_uuid(),
   tahun int not null,
   bulan int not null check (bulan between 1 and 12),
+  tanggal date,
   kategori text not null,
   kelompok text,
   jumlah numeric not null default 0,
@@ -24,6 +25,10 @@ create table if not exists public.pendapatan (
   petugas text,
   created_at timestamptz default now()
 );
+
+-- Kalau tabel pendapatan sudah pernah dibuat sebelumnya (proyek lama),
+-- baris di bawah ini menambahkan kolom tanggal tanpa menghapus data yang ada:
+alter table public.pendapatan add column if not exists tanggal date;
 
 -- 3) Tabel Utang
 create table if not exists public.utang (

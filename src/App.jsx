@@ -45,7 +45,7 @@ const KATEGORI_PENDAPATAN = [
   { nama: "Lain-lain", kelompok: "Pendapatan Lain-lain yang Sah" },
 ];
 const KELOMPOK_UTANG = ["Utang Bank/Lembaga Keuangan","Utang Supplier/Vendor","Utang Pajak","Utang Lain-lain"];
-const KELOMPOK_PIUTANG = ["Piutang Pelanggan/Pembeli","Piutang Karyawan","Piutang Pihak Lain","Piutang Lain-lain"];
+const KELOMPOK_PIUTANG = ["Piutang Abadi (Macet)","BPJS Kesehatan","BPJS Ambulance","BPJS Obat","Jasaraharja","Kerjasama (PT/Klinik)"];
 
 // Daftar Kode Sub Kegiatan (dari data Pak Direktur) — dipakai untuk
 // dropdown pencarian di form Realisasi Belanja.
